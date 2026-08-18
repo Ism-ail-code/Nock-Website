@@ -35,15 +35,19 @@ bottom of `index.html`:
 
 ```js
 const NOCK_RELEASE = {
-  version: '1.0.0',
+  version: '1.2.0',
   repo: 'Ism-ail-code/Nock',
 };
 ```
 
-For the next release, change `version` to the new version (e.g. `'1.1.0'`).
+For the next release, change `version` to the new version (e.g. `'1.3.0'`).
 The installer, portable build, version pill and meta line all update
 automatically — the URLs point directly at the GitHub release assets
 (`?download=1`), so the Download button never redirects to the release page.
+
+If the release tag does not follow the `v<version>` convention, set `tag`
+explicitly (e.g. `tag: 'Nock_v1.3.0'`). When omitted it defaults to
+`'v' + version`.
 
 ## Deploy to Vercel
 

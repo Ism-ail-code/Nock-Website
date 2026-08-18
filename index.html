@@ -319,15 +319,18 @@
 
 <script>
   // ═══ Release config — the ONLY place to edit for each new release ═══
-  // For v1.1.0 just change `version` to '1.1.0' (asset names and tag are
-  // derived automatically: Nock-Setup-1.1.0.exe, tag v1.1.0).
+  // Change `version` to the new version (asset names derive automatically:
+  // Nock-Setup-1.3.0.exe, Nock-1.3.0-portable.exe). `tag` overrides the
+  // release tag; when omitted it defaults to 'v' + version.
   const NOCK_RELEASE = {
-    version: '1.0.0',             // e.g. '1.1.0' for the next release
+    version: '1.2.0',             // e.g. '1.3.0' for the next release
     repo: 'Ism-ail-code/Nock',  // GitHub owner/repo that hosts the releases
+    tag: 'Nock_v1.2.0',         // e.g. 'v1.3.0'; defaults to 'v' + version
   };
   (() => {
     const v = NOCK_RELEASE.version;
-    const base = 'https://github.com/' + NOCK_RELEASE.repo + '/releases/download/v' + v;
+    const tag = NOCK_RELEASE.tag || 'v' + v;
+    const base = 'https://github.com/' + NOCK_RELEASE.repo + '/releases/download/' + tag;
     document.getElementById('dl-installer').href = base + '/Nock-Setup-' + v + '.exe?download=1';
     document.getElementById('dl-portable').href = base + '/Nock-' + v + '-portable.exe?download=1';
     document.getElementById('pill').textContent = 'v' + v;
