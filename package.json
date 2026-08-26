@@ -4,5 +4,8 @@
   "private": true,
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
   }
 }
