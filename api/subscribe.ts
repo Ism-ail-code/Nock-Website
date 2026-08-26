@@ -6,15 +6,17 @@ const supabase = createClient(
 );
 
 export default async function handler(req, res) {
+  res.setHeader('Content-Type', 'application/json');
+
   if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, message: 'Method not allowed' });
+    return res.status(405).json({ success: false, alreadySubscribed: false, message: 'Method not allowed' });
   }
 
   const { email } = req.body;
   const trimmed = email?.trim?.().toLowerCase();
 
   if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
-    return res.status(400).json({ success: false, message: 'Invalid email format' });
+    return res.status(400).json({ success: false, alreadySubscribed: false, message: 'Invalid email' });
   }
 
   const isUnsubscribe = req.query.action === 'unsubscribe';
@@ -24,8 +26,10 @@ export default async function handler(req, res) {
       .from('subscribers')
       .update({ status: 'unsubscribed' })
       .eq('email', trimmed);
-    if (error) return res.status(500).json({ success: false, message: error.message });
-    return res.json({ success: true, message: 'Unsubscribed' });
+    if (error) {
+      return res.status(500).json({ success: false, message: 'Unable to unsubscribe right now. Please try again later.' });
+    }
+    return res.json({ success: true, alreadySubscribed: false, message: 'Unsubscribed successfully' });
   }
 
   const { error } = await supabase
@@ -34,10 +38,10 @@ export default async function handler(req, res) {
 
   if (error) {
     if (error.code === '23505') {
-      return res.json({ success: false, alreadySubscribed: true, message: "You're already subscribed! ✓" });
+      return res.json({ success: true, alreadySubscribed: true, message: "You're already subscribed!" });
     }
-    return res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: 'Unable to subscribe right now. Please try again later.' });
   }
 
-  return res.json({ success: true, message: 'Subscribed successfully' });
+  return res.json({ success: true, alreadySubscribed: false, message: 'Subscribed successfully' });
 }
