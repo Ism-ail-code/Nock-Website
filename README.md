@@ -35,7 +35,7 @@ bottom of `index.html`:
 
 ```js
 const NOCK_RELEASE = {
-  version: '1.2.3',
+  version: '1.2.4',
   repo: 'Ism-ail-code/Nock',
 };
 ```
