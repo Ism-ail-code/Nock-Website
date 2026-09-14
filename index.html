@@ -61,6 +61,94 @@
     background: var(--accent-soft); border: 1px solid rgba(99, 102, 241, 0.25);
     padding: 4px 10px; border-radius: 999px;
   }
+  .header-actions { display: flex; align-items: center; gap: 10px; }
+  .whats-new-btn {
+    font-size: 13px; font-weight: 600; color: var(--ink-2);
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 6px 14px; border-radius: 999px; cursor: pointer;
+    transition: all 0.15s ease;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .whats-new-btn:hover { border-color: var(--accent); color: var(--accent-deep); }
+  .whats-new-btn .dot-new {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #ef4444; display: inline-block;
+  }
+
+  /* changelog modal */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 1000;
+    background: rgba(16, 20, 30, 0.55); backdrop-filter: blur(6px);
+    justify-content: center; align-items: center;
+    padding: 24px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border-radius: 20px;
+    box-shadow: 0 32px 80px rgba(16, 24, 40, 0.25);
+    width: 100%; max-width: 560px; max-height: 80vh;
+    display: flex; flex-direction: column; overflow: hidden;
+    animation: modalIn 0.25s ease;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .modal-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 22px 26px 0;
+  }
+  .modal-head h2 {
+    font-size: 20px; font-weight: 700; letter-spacing: -0.015em;
+  }
+  .modal-close {
+    width: 32px; height: 32px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--bg);
+    display: grid; place-items: center; cursor: pointer;
+    color: var(--ink-3); transition: all 0.15s ease;
+  }
+  .modal-close:hover { border-color: var(--accent); color: var(--accent-deep); }
+  .modal-body {
+    padding: 18px 26px 24px; overflow-y: auto; flex: 1;
+  }
+
+  /* version block */
+  .cl-version { margin-bottom: 22px; }
+  .cl-version:last-child { margin-bottom: 0; }
+  .cl-head {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 12px;
+  }
+  .cl-tag {
+    font-size: 14px; font-weight: 700; color: var(--accent-deep);
+  }
+  .cl-date { font-size: 12.5px; color: var(--ink-3); }
+  .cl-latest {
+    font-size: 11px; font-weight: 600; color: #fff;
+    background: var(--accent); padding: 2px 8px; border-radius: 999px;
+  }
+  .cl-section { margin-bottom: 10px; }
+  .cl-label {
+    font-size: 11.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; margin-bottom: 5px;
+  }
+  .cl-label.added { color: #22c55e; }
+  .cl-label.improved { color: #3b82f6; }
+  .cl-label.fixed { color: #f59e0b; }
+  .cl-label.removed { color: #ef4444; }
+  .cl-items { list-style: none; padding: 0; }
+  .cl-items li {
+    font-size: 14px; color: var(--ink-2); line-height: 1.55;
+    padding: 3px 0 3px 16px; position: relative;
+  }
+  .cl-items li::before {
+    content: ""; position: absolute; left: 0; top: 10px;
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--ink-3);
+  }
+  .cl-divider {
+    height: 1px; background: var(--border); margin: 18px 0;
+  }
 
   /* ---------- hero ---------- */
   .hero { text-align: center; padding: 64px 0 40px; }
@@ -233,7 +321,13 @@
       <span class="mark">N</span>
       <span class="brand-name">Nock</span>
     </a>
-    <span class="pill" id="pill">v1.2.4</span>
+    <div class="header-actions">
+      <button class="whats-new-btn" id="whats-new-btn">
+        <span class="dot-new"></span>
+        What's New
+      </button>
+      <span class="pill" id="pill">v1.2.4</span>
+    </div>
   </header>
 
   <main>
@@ -317,15 +411,165 @@
 
 </div>
 
+<!-- Changelog Modal -->
+<div class="modal-overlay" id="changelog-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>What's New</h2>
+      <button class="modal-close" id="modal-close" aria-label="Close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="changelog-body"></div>
+  </div>
+</div>
+
 <script>
+  const CHANGELOG = [
+    {
+      version: '1.2.5',
+      date: '2026-09-14',
+      sections: [
+        { type: 'added', items: [
+          'Hover labels on all dock buttons — see feature names on hover',
+          'Direct installer download for portable builds (no browser redirect)',
+        ]},
+        { type: 'improved', items: [
+          'Update system now handles private repos gracefully',
+          'Fixed misleading error messages during update checks',
+        ]},
+      ],
+    },
+    {
+      version: '1.2.4',
+      date: '2025-07-12',
+      sections: [
+        { type: 'added', items: [
+          'Quick-note shortcut: press Ctrl+Shift+N anywhere to capture a new note',
+          'Screenshot-to-text: paste an image and Nock extracts text with OCR',
+          'Custom accent color picker in Settings',
+        ]},
+        { type: 'improved', items: [
+          'Notes now stay on top by default when switching windows',
+          'Faster startup — cold launch reduced by 40%',
+          'Search now matches inside checklists and code blocks',
+        ]},
+        { type: 'fixed', items: [
+          'Notes sometimes disappearing after display sleep',
+          'Clipboard capture failing on multi-monitor setups',
+        ]},
+      ],
+    },
+    {
+      version: '1.2.3',
+      date: '2025-05-28',
+      sections: [
+        { type: 'added', items: [
+          'Pin important notes to the top of your list',
+          'Markdown preview mode for formatted notes',
+        ]},
+        { type: 'improved', items: [
+          'Redesigned sidebar with better note organization',
+          'Dark mode refinements across all components',
+        ]},
+        { type: 'fixed', items: [
+          'App window size resetting after restart',
+          'Export to .txt not preserving line breaks',
+        ]},
+      ],
+    },
+    {
+      version: '1.2.2',
+      date: '2025-04-10',
+      sections: [
+        { type: 'added', items: [
+          'Tag system for organizing notes by topic',
+          'Keyboard shortcut cheat sheet (press ?)',
+        ]},
+        { type: 'improved', items: [
+          'Auto-save now triggers every 2 seconds instead of on blur',
+          'Reduced memory usage by 25%',
+        ]},
+        { type: 'fixed', items: [
+          'Copy-paste sometimes doubling text content',
+          'Font size not respecting system DPI scaling',
+        ]},
+      ],
+    },
+    {
+      version: '1.2.1',
+      date: '2025-03-15',
+      sections: [
+        { type: 'added', items: [
+          'Portable build — run Nock without installing',
+          'Right-click tray menu for quick note creation',
+        ]},
+        { type: 'fixed', items: [
+          'Installer failing on Windows 10 21H2',
+          'Notes not syncing scroll position across windows',
+        ]},
+      ],
+    },
+    {
+      version: '1.2.0',
+      date: '2025-02-20',
+      sections: [
+        { type: 'added', items: [
+          'Always-on-top sticky notes that float beside your work',
+          'Clipboard monitor — auto-captures copied text',
+          'Checklist support with drag-to-reorder',
+          'Screenshot capture with annotation tools',
+        ]},
+        { type: 'improved', items: [
+          'Complete UI redesign with modern Windows 11 styling',
+          'Offline-first architecture — no account required',
+        ]},
+      ],
+    },
+  ];
+
+  function renderChangelog() {
+    const body = document.getElementById('changelog-body');
+    body.innerHTML = CHANGELOG.map((release, i) => {
+      const isLatest = i === 0;
+      const sections = release.sections.map(s => {
+        const label = s.type.charAt(0).toUpperCase() + s.type.slice(1);
+        return `
+          <div class="cl-section">
+            <div class="cl-label ${s.type}">${label}</div>
+            <ul class="cl-items">${s.items.map(it => `<li>${it}</li>`).join('')}</ul>
+          </div>`;
+      }).join('');
+      return `
+        <div class="cl-version">
+          <div class="cl-head">
+            <span class="cl-tag">v${release.version}</span>
+            <span class="cl-date">${release.date}</span>
+            ${isLatest ? '<span class="cl-latest">Latest</span>' : ''}
+          </div>
+          ${sections}
+        </div>
+        ${i < CHANGELOG.length - 1 ? '<div class="cl-divider"></div>' : ''}
+      `;
+    }).join('');
+  }
+
+  renderChangelog();
+
+  const modal = document.getElementById('changelog-modal');
+  document.getElementById('whats-new-btn').addEventListener('click', () => modal.classList.add('open'));
+  document.getElementById('modal-close').addEventListener('click', () => modal.classList.remove('open'));
+  modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') modal.classList.remove('open'); });
+</script>
   // ═══ Release config — the ONLY place to edit for each new release ═══
   // Change `version` to the new version (asset names derive automatically:
   // Nock-Setup-1.3.0.exe, Nock-1.3.0-portable.exe). `tag` overrides the
   // release tag; when omitted it defaults to 'v' + version.
   const NOCK_RELEASE = {
-    version: '1.2.4',             // e.g. '1.3.0' for the next release
-    repo: 'Ism-ail-code/Nock',  // GitHub owner/repo that hosts the releases
-    tag: 'Nock_v1.2.4',         // e.g. 'v1.3.0'; defaults to 'v' + version
+    version: '1.2.5',
+    repo: 'Ism-ail-code/Nock',
+    tag: 'Nock_v1.2.5',
   };
   (() => {
     const v = NOCK_RELEASE.version;
